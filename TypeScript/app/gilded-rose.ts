@@ -10,6 +10,63 @@ export class Item {
   }
 }
 
+interface ItemBehavior {
+  updateQuality(item: Item, gildedRose: GildedRose): void;
+  decreasesSellIn(): boolean;
+}
+
+class RegularItemBehavior implements ItemBehavior {
+  updateQuality(item: Item, gildedRose: GildedRose): void {
+    gildedRose.decreaseRegularItemQuality(item);
+  }
+  decreasesSellIn(): boolean {
+    return true;
+  }
+}
+
+class AgedBrieItemBehavior implements ItemBehavior {
+  updateQuality(item: Item, gildedRose: GildedRose): void {
+    gildedRose.increaseItemQuality(item);
+  }
+  decreasesSellIn(): boolean {
+    return true;
+  }
+}
+
+class BackstagePassItemBehavior implements ItemBehavior {
+  updateQuality(item: Item, gildedRose: GildedRose): void {
+    if (item.sellIn < 0) {
+      item.quality = 0;
+    } else {
+      gildedRose.increaseItemQuality(item);
+      if (item.sellIn < 11) {
+        gildedRose.increaseItemQuality(item);
+      }
+      if (item.sellIn < 6) {
+        gildedRose.increaseItemQuality(item);
+      }
+    }
+  }
+  decreasesSellIn(): boolean {
+    return true;
+  }
+}
+class SulfurasItemBehavior implements ItemBehavior {
+  updateQuality(item: Item, gildedRose: GildedRose): void {}
+  decreasesSellIn(): boolean {
+    return false;
+  }
+}
+
+const createItemBehavior = (item: Item): ItemBehavior => {
+  if (item.name == "Sulfuras, Hand of Ragnaros")
+    return new SulfurasItemBehavior();
+  if (item.name == "Aged Brie") return new AgedBrieItemBehavior();
+  if (item.name == "Backstage passes to a TAFKAL80ETC concert")
+    return new BackstagePassItemBehavior();
+  return new RegularItemBehavior();
+};
+
 export class GildedRose {
   items: Array<Item>;
 
@@ -19,61 +76,35 @@ export class GildedRose {
 
   updateQuality() {
     for (let i = 0; i < this.items.length; i++) {
-      if (!this.isSulfuras(this.items[i])) {
-        this.updateItemQuality(this.items[i]);
-        this.decreaseItemSellIn(this.items[i]);
-        this.updateItemQualityAfterDecreasingSellIn(this.items[i]);
-      }
+      const itemBehavior = createItemBehavior(this.items[i]);
+
+      itemBehavior.updateQuality(this.items[i], this);
+      this.decreaseItemSellIn(this.items[i], itemBehavior);
+      this.updateItemQualityAfterDecreasingSellIn(this.items[i], itemBehavior);
     }
 
     return this.items;
   }
 
-  private isSulfuras(item: Item) {
-    return item.name == "Sulfuras, Hand of Ragnaros";
-  }
-
-  private updateItemQuality(item: Item) {
-    if (item.name == "Aged Brie") {
-      this.increaseItemQuality(item);
-    } else if (item.name == "Backstage passes to a TAFKAL80ETC concert") {
-      this.updateBackstagePassesItemQuality(item);
-    } else {
-      this.decreaseRegularItemQuality(item);
+  private decreaseItemSellIn(item: Item, itemBehavior: ItemBehavior) {
+    if (itemBehavior.decreasesSellIn()) {
+      item.sellIn = item.sellIn - 1;
     }
   }
 
-  private decreaseItemSellIn(item: Item) {
-    item.sellIn = item.sellIn - 1;
-  }
-
-  private updateItemQualityAfterDecreasingSellIn(item: Item) {
+  private updateItemQualityAfterDecreasingSellIn(item: Item, itemBehavior: ItemBehavior) {
     if (item.sellIn < 0) {
-      this.updateItemQuality(item);
+      itemBehavior.updateQuality(item, this);
     }
   }
 
-  private updateBackstagePassesItemQuality(item: Item) {
-    if (item.sellIn < 0) {
-      item.quality = 0;
-    } else {
-      this.increaseItemQuality(item);
-      if (item.sellIn < 11) {
-        this.increaseItemQuality(item);
-      }
-      if (item.sellIn < 6) {
-        this.increaseItemQuality(item);
-      }
-    }
-  }
-
-  private increaseItemQuality(item: Item) {
+  increaseItemQuality(item: Item) {
     if (item.quality < 50) {
       item.quality = item.quality + 1;
     }
   }
 
-  private decreaseRegularItemQuality(item: Item) {
+  decreaseRegularItemQuality(item: Item) {
     if (item.quality > 0) {
       item.quality = item.quality - 1;
     }
