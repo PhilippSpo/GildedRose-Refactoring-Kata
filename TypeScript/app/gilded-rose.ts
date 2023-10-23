@@ -56,7 +56,9 @@ export class GildedRose {
   }
 
   private updateBackstagePassesItemQuality(item: Item) {
-    if (item.quality < 50) {
+    if (item.sellIn < 0) {
+      item.quality = 0;
+    } else if (item.quality < 50) {
       item.quality = item.quality + 1;
       if (item.sellIn < 11) {
         if (item.quality < 50) {
@@ -85,7 +87,7 @@ export class GildedRose {
     if (item.name == "Aged Brie") {
       this.updateAgedBrieItemQuality(item);
     } else if (item.name == "Backstage passes to a TAFKAL80ETC concert") {
-      item.quality = 0;
+      this.updateBackstagePassesItemQuality(item);
     } else {
       if (item.quality > 0) {
         item.quality = item.quality - 1;
