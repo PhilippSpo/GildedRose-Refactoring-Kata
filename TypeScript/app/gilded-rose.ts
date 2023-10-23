@@ -41,9 +41,12 @@ export class GildedRose {
     ) {
       this.updateValueGainingItemQuality(item);
     } else {
-      if (item.quality > 0) {
-        item.quality = item.quality - 1;
-      }
+      this.decreaseRegularItemQuality(item);
+    }
+  }
+  private decreaseRegularItemQuality(item: Item) {
+    if (item.quality > 0) {
+      item.quality = item.quality - 1;
     }
   }
   private updateValueGainingItemQuality(item: Item) {
