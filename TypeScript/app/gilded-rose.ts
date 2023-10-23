@@ -10,82 +10,88 @@ export class Item {
   }
 }
 
+class ItemUpdater {
+  static unsetQuality(item: Item) {
+    item.quality = 0;
+  }
+  static decreaseItemSellIn(item: Item) {
+    item.sellIn = item.sellIn - 1;
+  }
+
+  static increaseItemQuality(item: Item) {
+    if (item.quality < 50) {
+      item.quality = item.quality + 1;
+    }
+  }
+
+  static decreaseRegularItemQuality(item: Item) {
+    if (item.quality > 0) {
+      item.quality = item.quality - 1;
+    }
+  }
+}
+
 interface ItemBehavior {
-  updateQuality(item: Item, gildedRose: GildedRose): void;
-  decreaseItemSellIn(item: Item, gildedRose: GildedRose): void;
-  updateItemQualityAfterDecreasingSellIn(
-    item: Item,
-    gildedRose: GildedRose
-  ): void;
+  updateQuality(item: Item): void;
+  decreaseItemSellIn(item: Item): void;
+  updateItemQualityAfterDecreasingSellIn(item: Item): void;
 }
 
 class RegularItemBehavior implements ItemBehavior {
-  updateQuality(item: Item, gildedRose: GildedRose): void {
-    gildedRose.decreaseRegularItemQuality(item);
+  updateQuality(item: Item): void {
+    ItemUpdater.decreaseRegularItemQuality(item);
   }
-  decreaseItemSellIn(item: Item, gildedRose: GildedRose): void {
-    gildedRose.decreaseItemSellIn(item);
+  decreaseItemSellIn(item: Item): void {
+    ItemUpdater.decreaseItemSellIn(item);
   }
-  updateItemQualityAfterDecreasingSellIn(
-    item: Item,
-    gildedRose: GildedRose
-  ): void {
+  updateItemQualityAfterDecreasingSellIn(item: Item): void {
     if (item.sellIn < 0) {
-      this.updateQuality(item, gildedRose);
+      this.updateQuality(item);
     }
   }
 }
 
 class AgedBrieItemBehavior implements ItemBehavior {
-  updateQuality(item: Item, gildedRose: GildedRose): void {
-    gildedRose.increaseItemQuality(item);
+  updateQuality(item: Item): void {
+    ItemUpdater.increaseItemQuality(item);
   }
-  decreaseItemSellIn(item: Item, gildedRose: GildedRose): void {
-    gildedRose.decreaseItemSellIn(item);
+  decreaseItemSellIn(item: Item): void {
+    ItemUpdater.decreaseItemSellIn(item);
   }
-  updateItemQualityAfterDecreasingSellIn(
-    item: Item,
-    gildedRose: GildedRose
-  ): void {
+  updateItemQualityAfterDecreasingSellIn(item: Item): void {
     if (item.sellIn < 0) {
-      this.updateQuality(item, gildedRose);
+      this.updateQuality(item);
     }
   }
 }
 
 class BackstagePassItemBehavior implements ItemBehavior {
-  updateQuality(item: Item, gildedRose: GildedRose): void {
+  updateQuality(item: Item): void {
     if (item.sellIn < 0) {
-      item.quality = 0;
+      ItemUpdater.unsetQuality(item);
     } else {
-      gildedRose.increaseItemQuality(item);
+      ItemUpdater.increaseItemQuality(item);
       if (item.sellIn < 11) {
-        gildedRose.increaseItemQuality(item);
+        ItemUpdater.increaseItemQuality(item);
       }
       if (item.sellIn < 6) {
-        gildedRose.increaseItemQuality(item);
+        ItemUpdater.increaseItemQuality(item);
       }
     }
   }
-  decreaseItemSellIn(item: Item, gildedRose: GildedRose): void {
-    gildedRose.decreaseItemSellIn(item);
+  decreaseItemSellIn(item: Item): void {
+    ItemUpdater.decreaseItemSellIn(item);
   }
-  updateItemQualityAfterDecreasingSellIn(
-    item: Item,
-    gildedRose: GildedRose
-  ): void {
+  updateItemQualityAfterDecreasingSellIn(item: Item): void {
     if (item.sellIn < 0) {
-      this.updateQuality(item, gildedRose);
+      this.updateQuality(item);
     }
   }
 }
 class SulfurasItemBehavior implements ItemBehavior {
-  updateQuality(item: Item, gildedRose: GildedRose): void {}
+  updateQuality(item: Item): void {}
   decreaseItemSellIn(): void {}
-  updateItemQualityAfterDecreasingSellIn(
-    item: Item,
-    gildedRose: GildedRose
-  ): void {}
+  updateItemQualityAfterDecreasingSellIn(item: Item): void {}
 }
 
 const createItemBehavior = (item: Item): ItemBehavior => {
@@ -108,27 +114,11 @@ export class GildedRose {
     for (let i = 0; i < this.items.length; i++) {
       const itemBehavior = createItemBehavior(this.items[i]);
 
-      itemBehavior.updateQuality(this.items[i], this);
-      itemBehavior.decreaseItemSellIn(this.items[i], this);
-      itemBehavior.updateItemQualityAfterDecreasingSellIn(this.items[i], this);
+      itemBehavior.updateQuality(this.items[i]);
+      itemBehavior.decreaseItemSellIn(this.items[i]);
+      itemBehavior.updateItemQualityAfterDecreasingSellIn(this.items[i]);
     }
 
     return this.items;
-  }
-
-  decreaseItemSellIn(item: Item) {
-    item.sellIn = item.sellIn - 1;
-  }
-
-  increaseItemQuality(item: Item) {
-    if (item.quality < 50) {
-      item.quality = item.quality + 1;
-    }
-  }
-
-  decreaseRegularItemQuality(item: Item) {
-    if (item.quality > 0) {
-      item.quality = item.quality - 1;
-    }
   }
 }
