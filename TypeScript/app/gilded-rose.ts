@@ -10,7 +10,7 @@ export class Item {
   }
 }
 
-class ItemUpdater {
+class ItemHelper {
   static unsetQuality(item: Item) {
     item.quality = 0;
   }
@@ -29,6 +29,14 @@ class ItemUpdater {
       item.quality = item.quality - 1;
     }
   }
+
+  static hasSellByDatePassed(item: Item) {
+    return ItemHelper.shouldSellWithinDays(item, 0);
+  }
+
+  static shouldSellWithinDays(item: Item, days: number) {
+    return item.sellIn < days;
+  }
 }
 
 interface ItemBehavior {
@@ -39,13 +47,13 @@ interface ItemBehavior {
 
 class RegularItemBehavior implements ItemBehavior {
   updateQuality(item: Item): void {
-    ItemUpdater.decreaseRegularItemQuality(item);
+    ItemHelper.decreaseRegularItemQuality(item);
   }
   decreaseItemSellIn(item: Item): void {
-    ItemUpdater.decreaseItemSellIn(item);
+    ItemHelper.decreaseItemSellIn(item);
   }
   updateItemQualityAfterDecreasingSellIn(item: Item): void {
-    if (item.sellIn < 0) {
+    if (ItemHelper.hasSellByDatePassed(item)) {
       this.updateQuality(item);
     }
   }
@@ -53,13 +61,13 @@ class RegularItemBehavior implements ItemBehavior {
 
 class AgedBrieItemBehavior implements ItemBehavior {
   updateQuality(item: Item): void {
-    ItemUpdater.increaseItemQuality(item);
+    ItemHelper.increaseItemQuality(item);
   }
   decreaseItemSellIn(item: Item): void {
-    ItemUpdater.decreaseItemSellIn(item);
+    ItemHelper.decreaseItemSellIn(item);
   }
   updateItemQualityAfterDecreasingSellIn(item: Item): void {
-    if (item.sellIn < 0) {
+    if (ItemHelper.hasSellByDatePassed(item)) {
       this.updateQuality(item);
     }
   }
@@ -67,27 +75,27 @@ class AgedBrieItemBehavior implements ItemBehavior {
 
 class BackstagePassItemBehavior implements ItemBehavior {
   updateQuality(item: Item): void {
-    if (item.sellIn < 0) {
-      ItemUpdater.unsetQuality(item);
+    if (ItemHelper.hasSellByDatePassed(item)) {
+      ItemHelper.unsetQuality(item);
       return;
     }
     this.increaseQuality(item);
   }
   decreaseItemSellIn(item: Item): void {
-    ItemUpdater.decreaseItemSellIn(item);
+    ItemHelper.decreaseItemSellIn(item);
   }
   updateItemQualityAfterDecreasingSellIn(item: Item): void {
-    if (item.sellIn < 0) {
+    if (ItemHelper.hasSellByDatePassed(item)) {
       this.updateQuality(item);
     }
   }
   private increaseQuality(item: Item) {
-    ItemUpdater.increaseItemQuality(item);
-    if (item.sellIn < 11) {
-      ItemUpdater.increaseItemQuality(item);
+    ItemHelper.increaseItemQuality(item);
+    if (ItemHelper.shouldSellWithinDays(item, 11)) {
+      ItemHelper.increaseItemQuality(item);
     }
-    if (item.sellIn < 6) {
-      ItemUpdater.increaseItemQuality(item);
+    if (ItemHelper.shouldSellWithinDays(item, 6)) {
+      ItemHelper.increaseItemQuality(item);
     }
   }
 }
