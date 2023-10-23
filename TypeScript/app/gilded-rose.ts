@@ -19,12 +19,19 @@ export class GildedRose {
 
   updateQuality() {
     for (let i = 0; i < this.items.length; i++) {
+      if (this.isSulfuras(this.items[i])) {
+        continue;
+      }
       this.updateItemQuality(this.items[i]);
       this.decreaseItemSellIn(this.items[i]);
       this.updateItemQualityForNegativeSellIn(this.items[i]);
     }
 
     return this.items;
+  }
+
+  private isSulfuras(item: Item) {
+    return item.name == "Sulfuras, Hand of Ragnaros"
   }
 
   private updateItemQuality(item: Item) {
@@ -49,17 +56,13 @@ export class GildedRose {
       }
     } else {
       if (item.quality > 0) {
-        if (item.name != "Sulfuras, Hand of Ragnaros") {
-          item.quality = item.quality - 1;
-        }
+        item.quality = item.quality - 1;
       }
     }
   }
 
   private decreaseItemSellIn(item: Item) {
-    if (item.name != "Sulfuras, Hand of Ragnaros") {
-      item.sellIn = item.sellIn - 1;
-    }
+    item.sellIn = item.sellIn - 1;
   }
 
   private updateItemQualityForNegativeSellIn(item: Item) {
@@ -73,9 +76,7 @@ export class GildedRose {
           item.quality = item.quality - item.quality;
         } else {
           if (item.quality > 0) {
-            if (item.name != "Sulfuras, Hand of Ragnaros") {
-              item.quality = item.quality - 1;
-            }
+            item.quality = item.quality - 1;
           }
         }
       }
