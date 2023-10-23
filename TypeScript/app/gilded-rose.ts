@@ -79,17 +79,7 @@ export class GildedRose {
 
   private updateItemQualityAfterDecreasingSellIn(item: Item) {
     if (item.sellIn < 0) {
-      this.updateItemQualityForNegativeSellIn(item);
-    }
-  }
-
-  private updateItemQualityForNegativeSellIn(item: Item) {
-    if (item.name == "Aged Brie") {
-      this.updateAgedBrieItemQuality(item);
-    } else if (item.name == "Backstage passes to a TAFKAL80ETC concert") {
-      this.updateBackstagePassesItemQuality(item);
-    } else {
-      this.decreaseRegularItemQuality(item);
+      this.updateItemQuality(item);
     }
   }
 }
