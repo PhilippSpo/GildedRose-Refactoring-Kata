@@ -35,7 +35,7 @@ export class GildedRose {
 
   private updateItemQuality(item: Item) {
     if (item.name == "Aged Brie") {
-      this.updateAgedBrieItemQuality(item);
+      this.increaseItemQuality(item);
     } else if (item.name == "Backstage passes to a TAFKAL80ETC concert") {
       this.updateBackstagePassesItemQuality(item);
     } else {
@@ -51,10 +51,6 @@ export class GildedRose {
     if (item.sellIn < 0) {
       this.updateItemQuality(item);
     }
-  }
-
-  private updateAgedBrieItemQuality(item: Item) {
-    this.increaseItemQuality(item);
   }
 
   private updateBackstagePassesItemQuality(item: Item) {
