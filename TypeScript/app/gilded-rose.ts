@@ -19,12 +19,11 @@ export class GildedRose {
 
   updateQuality() {
     for (let i = 0; i < this.items.length; i++) {
-      if (this.isSulfuras(this.items[i])) {
-        continue;
+      if (!this.isSulfuras(this.items[i])) {
+        this.updateItemQuality(this.items[i]);
+        this.decreaseItemSellIn(this.items[i]);
+        this.updateItemQualityAfterDecreasingSellIn(this.items[i]);
       }
-      this.updateItemQuality(this.items[i]);
-      this.decreaseItemSellIn(this.items[i]);
-      this.updateItemQualityAfterDecreasingSellIn(this.items[i]);
     }
 
     return this.items;
@@ -43,35 +42,6 @@ export class GildedRose {
       this.decreaseRegularItemQuality(item);
     }
   }
-  private decreaseRegularItemQuality(item: Item) {
-    if (item.quality > 0) {
-      item.quality = item.quality - 1;
-    }
-  }
-
-  private updateAgedBrieItemQuality(item: Item) {
-    if (item.quality < 50) {
-      item.quality = item.quality + 1;
-    }
-  }
-
-  private updateBackstagePassesItemQuality(item: Item) {
-    if (item.sellIn < 0) {
-      item.quality = 0;
-    } else if (item.quality < 50) {
-      item.quality = item.quality + 1;
-      if (item.sellIn < 11) {
-        if (item.quality < 50) {
-          item.quality = item.quality + 1;
-        }
-      }
-      if (item.sellIn < 6) {
-        if (item.quality < 50) {
-          item.quality = item.quality + 1;
-        }
-      }
-    }
-  }
 
   private decreaseItemSellIn(item: Item) {
     item.sellIn = item.sellIn - 1;
@@ -80,6 +50,36 @@ export class GildedRose {
   private updateItemQualityAfterDecreasingSellIn(item: Item) {
     if (item.sellIn < 0) {
       this.updateItemQuality(item);
+    }
+  }
+
+  private updateAgedBrieItemQuality(item: Item) {
+    this.increaseItemQuality(item);
+  }
+
+  private updateBackstagePassesItemQuality(item: Item) {
+    if (item.sellIn < 0) {
+      item.quality = 0;
+    } else {
+      this.increaseItemQuality(item);
+      if (item.sellIn < 11) {
+        this.increaseItemQuality(item);
+      }
+      if (item.sellIn < 6) {
+        this.increaseItemQuality(item);
+      }
+    }
+  }
+
+  private increaseItemQuality(item: Item) {
+    if (item.quality < 50) {
+      item.quality = item.quality + 1;
+    }
+  }
+
+  private decreaseRegularItemQuality(item: Item) {
+    if (item.quality > 0) {
+      item.quality = item.quality - 1;
     }
   }
 }
