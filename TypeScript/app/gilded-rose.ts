@@ -69,15 +69,9 @@ class BackstagePassItemBehavior implements ItemBehavior {
   updateQuality(item: Item): void {
     if (item.sellIn < 0) {
       ItemUpdater.unsetQuality(item);
-    } else {
-      ItemUpdater.increaseItemQuality(item);
-      if (item.sellIn < 11) {
-        ItemUpdater.increaseItemQuality(item);
-      }
-      if (item.sellIn < 6) {
-        ItemUpdater.increaseItemQuality(item);
-      }
+      return;
     }
+    this.increaseQuality(item);
   }
   decreaseItemSellIn(item: Item): void {
     ItemUpdater.decreaseItemSellIn(item);
@@ -85,6 +79,15 @@ class BackstagePassItemBehavior implements ItemBehavior {
   updateItemQualityAfterDecreasingSellIn(item: Item): void {
     if (item.sellIn < 0) {
       this.updateQuality(item);
+    }
+  }
+  private increaseQuality(item: Item) {
+    ItemUpdater.increaseItemQuality(item);
+    if (item.sellIn < 11) {
+      ItemUpdater.increaseItemQuality(item);
+    }
+    if (item.sellIn < 6) {
+      ItemUpdater.increaseItemQuality(item);
     }
   }
 }
