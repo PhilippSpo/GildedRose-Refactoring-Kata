@@ -123,4 +123,24 @@ describe("Gilded Rose", () => {
       expect(items[0].quality).toBe(0);
     });
   });
+  describe("Conjured", () => {
+    it("should lower the quality by two", () => {
+      const gildedRose = new GildedRose([new Item("Conjured", 5, 5)]);
+      const items = gildedRose.updateQuality();
+      expect(items[0].sellIn).toBe(4);
+      expect(items[0].quality).toBe(3);
+    });
+    it("Once the sell by date has passed, Quality degrades by four", () => {
+      const gildedRose = new GildedRose([new Item("Conjured", 0, 4)]);
+      const items = gildedRose.updateQuality();
+      expect(items[0].sellIn).toBe(-1);
+      expect(items[0].quality).toBe(0);
+    });
+    it("should not allow the quality to get negative", () => {
+      const gildedRose = new GildedRose([new Item("Conjured", 0, 0)]);
+      const items = gildedRose.updateQuality();
+      expect(items[0].sellIn).toBe(-1);
+      expect(items[0].quality).toBe(0);
+    });
+  })
 });

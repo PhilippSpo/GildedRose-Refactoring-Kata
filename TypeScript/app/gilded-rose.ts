@@ -105,12 +105,29 @@ class SulfurasItemBehavior implements ItemBehavior {
   updateItemQualityAfterDecreasingSellIn(item: Item): void {}
 }
 
+class ConjuredItemBehavior implements ItemBehavior {
+  updateQuality(item: Item): void {
+    ItemHelper.decreaseRegularItemQuality(item);
+    ItemHelper.decreaseRegularItemQuality(item);
+  }
+  decreaseItemSellIn(item: Item): void {
+    ItemHelper.decreaseItemSellIn(item);
+  }
+  updateItemQualityAfterDecreasingSellIn(item: Item): void {
+    if (ItemHelper.hasSellByDatePassed(item)) {
+      this.updateQuality(item);
+    }
+  }
+}
+
 const createItemBehavior = (item: Item): ItemBehavior => {
   if (item.name == "Sulfuras, Hand of Ragnaros")
     return new SulfurasItemBehavior();
   if (item.name == "Aged Brie") return new AgedBrieItemBehavior();
   if (item.name == "Backstage passes to a TAFKAL80ETC concert")
     return new BackstagePassItemBehavior();
+  if (item.name == "Conjured")
+    return new ConjuredItemBehavior();
   return new RegularItemBehavior();
 };
 
